@@ -198,9 +198,6 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
             }
             ++index;
             
-//            doc.setParagraphAttributes(doc.getLength(), 100, right, false);
-//            doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", right);
-            
         }
         catch(Exception e) {
             e.printStackTrace();

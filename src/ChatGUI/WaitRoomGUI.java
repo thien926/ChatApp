@@ -46,7 +46,7 @@ public class WaitRoomGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         pnMainWaitRoom = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lblMessage = new javax.swing.JLabel();
         btnSuccessWaitRoom = new javax.swing.JButton();
         btnErrorWaitRoom = new javax.swing.JButton();
 
@@ -56,10 +56,10 @@ public class WaitRoomGUI extends javax.swing.JFrame {
 
         pnMainWaitRoom.setBackground(new java.awt.Color(0, 51, 51));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Đang chờ ghép đôi ...");
+        lblMessage.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMessage.setForeground(new java.awt.Color(255, 255, 255));
+        lblMessage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblMessage.setText("Đang chờ ghép đôi ...");
 
         btnSuccessWaitRoom.setBackground(new java.awt.Color(204, 204, 204));
         btnSuccessWaitRoom.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -108,13 +108,13 @@ public class WaitRoomGUI extends javax.swing.JFrame {
                     .addComponent(btnErrorWaitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSuccessWaitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(125, Short.MAX_VALUE))
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnMainWaitRoomLayout.setVerticalGroup(
             pnMainWaitRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnMainWaitRoomLayout.createSequentialGroup()
                 .addGap(43, 43, 43)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(41, 41, 41)
                 .addComponent(btnSuccessWaitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
@@ -190,7 +190,7 @@ public class WaitRoomGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify                     
     private javax.swing.JButton btnErrorWaitRoom;
     private javax.swing.JButton btnSuccessWaitRoom;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblMessage;
     private javax.swing.JPanel pnMainWaitRoom;
     // End of variables declaration                   
 }
