@@ -4,18 +4,27 @@ package ChatGUI;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-public class LoginGUI extends javax.swing.JFrame {
+import org.json.JSONObject;
 
-    public LoginGUI() {
+import ChatSocketClient.DataSocketClient;
+import ChatSocketClient.SocketConnectionClient;
+import ChatSocketClient.SocketHandlerClient;
+
+public class LoginGUI extends javax.swing.JFrame {
+	SocketConnectionClient socket = new SocketConnectionClient();
+	DataSocketClient dataSocket = new DataSocketClient();
+	private String username = "";
+	
+    public LoginGUI(String username) {
+    	this.username = username;
         initComponents();
         
         // set Location
@@ -29,15 +38,36 @@ public class LoginGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
         
+        final LoginGUI gui = this;
+        socket.startConnection();
+        socket.addListenConnection("send_nickname_response", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+                boolean isSuccess = data.getBoolean("is_success");
+                
+                if (isSuccess){
+                	WaitRoomGUI cc = new WaitRoomGUI(txtUserName.getText().trim());
+            	    cc.setVisible(true);
+            	    dispose();
+                }
+                else{
+                	btnLogin.setEnabled(true);
+                    String message = data.getString("message");
+                    JOptionPane.showMessageDialog(gui, message, "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
         // set Onclose
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);// when [X] is pressed
-        final LoginGUI gui = this;
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 int i = JOptionPane.showConfirmDialog(gui,
                         "Bạn có chắc muốn thoát ứng dụng?", "Thoát ứng dụng",
                         JOptionPane.YES_NO_OPTION);
                 if (i == JOptionPane.YES_OPTION) {
+//                	String dataSend = dataSocket.exportDataExitApp(gui.username);
+//                	socket.sendData(dataSend);
                     System.exit(0);
                 }
             }
@@ -61,6 +91,7 @@ public class LoginGUI extends javax.swing.JFrame {
 
         txtUserName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtUserName.setToolTipText("Nhập tên đăng nhập");
+        txtUserName.setText(this.username);
 
         btnLogin.setBackground(new java.awt.Color(204, 204, 204));
         btnLogin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -124,11 +155,21 @@ public class LoginGUI extends javax.swing.JFrame {
     }                                    
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {                                         
-//        JOptionPane.showMessageDialog(this, "Tài khoản đã tồn tại", "Error", JOptionPane.ERROR_MESSAGE);
-        WaitRoomGUI cc = new WaitRoomGUI();
-        cc.setVisible(true);;
+//        JOptionPane.showMessageDialog(this, "Nickname đã tồn tại", "Error", JOptionPane.ERROR_MESSAGE);
+//        WaitRoomGUI cc = new WaitRoomGUI();
+//        cc.setVisible(true);
+//        this.dispose();
+    	
+    	String nickname = txtUserName.getText().trim();
+    	
+    	if(nickname.equals("")) {
+    		JOptionPane.showMessageDialog(this, "Nickname không được rỗng!", "Error", JOptionPane.ERROR_MESSAGE);
+    		return;
+    	}
+    	this.btnLogin.setEnabled(false);
+    	String data = dataSocket.exportDataSendNickname(nickname);
+        socket.sendData(data);
         
-        this.dispose();
     }                                        
 
     public static void main(String args[]) {
@@ -151,7 +192,7 @@ public class LoginGUI extends javax.swing.JFrame {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LoginGUI().setVisible(true);
+                new LoginGUI("").setVisible(true);
             }
         });
     }

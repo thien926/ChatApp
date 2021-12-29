@@ -4,6 +4,8 @@ package ChatGUI;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -13,9 +15,20 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-public class WaitRoomGUI extends javax.swing.JFrame {
+import org.json.JSONObject;
 
-    public WaitRoomGUI() {
+import ChatSocketClient.DataSocketClient;
+import ChatSocketClient.SocketConnectionClient;
+import ChatSocketClient.SocketHandlerClient;
+
+public class WaitRoomGUI extends javax.swing.JFrame {
+	private static String username = "";
+	private static String username2 = "";
+	private SocketConnectionClient socket = new SocketConnectionClient();
+    private DataSocketClient dataSocket = new DataSocketClient();
+	
+    public WaitRoomGUI(String username) {
+    	this.username = username;
         initComponents();
         
         // set Location
@@ -29,14 +42,83 @@ public class WaitRoomGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
         
+        final WaitRoomGUI gui = this;
+        socket.addListenConnection("send_invitation", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+                String username2 = data.getString("username");
+                gui.username2 = username2;
+                lblMessage.setText("Đối tượng: " + username2);
+                btnSuccessWaitRoom.setText("Đồng ý");
+                btnSuccessWaitRoom.setEnabled(true);
+                btnErrorWaitRoom.setText("Từ chối");
+            }
+        });
+        
+        
+        socket.addListenConnection("start_message", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+                boolean is_started = data.getBoolean("is_started");
+                
+                if (is_started){
+                	
+                	System.out.println(gui.username);
+                	MainScreenChatGUI mainScreen = new MainScreenChatGUI(gui.username, gui.username2);
+	                mainScreen.setVisible(true);
+	                dispose();
+                }
+                else{
+                	gui.btnSuccessWaitRoom.setEnabled(true);
+                	lblMessage.setText("Đang ở phòng đợi!");
+                	btnSuccessWaitRoom.setText("Bắt đầu ghép đôi");
+                	btnErrorWaitRoom.setText("Hủy");
+                }
+            }
+        });
+        
+        socket.addListenConnection("exit_app_response", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+            	
+            	gui.dispose();
+            	LoginGUI lg = new LoginGUI(gui.username);
+                lg.setVisible(true);
+                
+            }
+        });
+        
+//        socket.addListenConnection("start_message", new SocketHandlerClient() {
+//            @Override
+//            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+//                boolean is_started = data.getBoolean("is_started");
+//                
+//                if (is_started){
+//                    get_pairing_status_false.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sgu/chat/images/get-pairing/get-pairing-status-true.png"))); // NOI18N
+//        
+//                    MainScreen mainScreen = new MainScreen(nickname);
+//                    mainScreen.setVisible(true);
+//                    dispose(); 
+//                }
+//                else{
+//                    WaitingPairing waitingPairing = new WaitingPairing();
+//                    waitingPairing.setVisible(true);
+//                    dispose(); 
+//                }
+//            }
+//        });
+        
         // set onClose
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);// when [X] is pressed
-        final WaitRoomGUI gui = this;
+        
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                LoginGUI lg = new LoginGUI();
-                lg.setVisible(true);
-                gui.dispose();
+                String dataSend = dataSocket.exportDataExitApp(gui.username);
+                socket.sendData(dataSend);
+                
+//                LoginGUI lg = new LoginGUI();
+//                lg.setVisible(true);
+//                gui.dispose();
             }
         });
     }
@@ -45,10 +127,11 @@ public class WaitRoomGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
-        pnMainWaitRoom = new javax.swing.JPanel();
+    	pnMainWaitRoom = new javax.swing.JPanel();
         lblMessage = new javax.swing.JLabel();
         btnSuccessWaitRoom = new javax.swing.JButton();
         btnErrorWaitRoom = new javax.swing.JButton();
+        lblUserName = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chờ ghép đôi");
@@ -59,7 +142,7 @@ public class WaitRoomGUI extends javax.swing.JFrame {
         lblMessage.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblMessage.setForeground(new java.awt.Color(255, 255, 255));
         lblMessage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblMessage.setText("Đang chờ ghép đôi ...");
+        lblMessage.setText("Đang ở phòng đợi!");
 
         btnSuccessWaitRoom.setBackground(new java.awt.Color(204, 204, 204));
         btnSuccessWaitRoom.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -98,6 +181,11 @@ public class WaitRoomGUI extends javax.swing.JFrame {
             }
         });
 
+        lblUserName.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblUserName.setForeground(new java.awt.Color(255, 255, 255));
+        lblUserName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblUserName.setText("Username : " + this.username);
+
         javax.swing.GroupLayout pnMainWaitRoomLayout = new javax.swing.GroupLayout(pnMainWaitRoom);
         pnMainWaitRoom.setLayout(pnMainWaitRoomLayout);
         pnMainWaitRoomLayout.setHorizontalGroup(
@@ -109,17 +197,20 @@ public class WaitRoomGUI extends javax.swing.JFrame {
                     .addComponent(btnSuccessWaitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(125, Short.MAX_VALUE))
             .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblUserName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnMainWaitRoomLayout.setVerticalGroup(
             pnMainWaitRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnMainWaitRoomLayout.createSequentialGroup()
-                .addGap(43, 43, 43)
+                .addContainerGap()
+                .addComponent(lblUserName, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(41, 41, 41)
+                .addGap(18, 18, 18)
                 .addComponent(btnSuccessWaitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(30, 30, 30)
                 .addComponent(btnErrorWaitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32))
+                .addGap(26, 26, 26))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -137,13 +228,47 @@ public class WaitRoomGUI extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void btnSuccessWaitRoomActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-        MainScreenChatGUI mainScreen = new MainScreenChatGUI();
-        mainScreen.setVisible(true);
-        this.dispose();
+//        MainScreenChatGUI mainScreen = new MainScreenChatGUI();
+//        mainScreen.setVisible(true);
+//        this.dispose();
+        
+        switch (btnSuccessWaitRoom.getText()) {
+			case "Bắt đầu ghép đôi": {
+				btnSuccessWaitRoom.setEnabled(false);
+				String username = this.username;
+		        String data = dataSocket.exportDataWaitingPairing(username);
+		        socket.sendData(data);
+		        this.lblMessage.setText("Đang chờ ghép đôi...!");
+				break;
+			}
+			case "Đồng ý": {
+				btnSuccessWaitRoom.setEnabled(false);
+				String dataSend = dataSocket.exportDataAcceptPairing(this.username, true);     
+		        socket.sendData(dataSend);
+				break;
+			}
+		default:
+			break;
+		}
     }                                                  
 
     private void btnErrorWaitRoomActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+    	switch (btnErrorWaitRoom.getText()) {
+//			case "Bắt đầu ghép đôi": {
+//				String username = this.username;
+//		        String data = dataSocket.exportDataGoMatch(username);
+//		        socket.sendData(data);
+//		        this.lblMessage.setText("Đang chờ ghép đôi...!");
+//				break;
+//			}
+			case "Từ chối": {
+				String dataSend = dataSocket.exportDataAcceptPairing(this.username, false);     
+		        socket.sendData(dataSend);
+				break;
+			}
+		default:
+			break;
+		}
     }                                                
 
     private void btnErrorWaitRoomMouseEntered(java.awt.event.MouseEvent evt) {                                              
@@ -182,7 +307,7 @@ public class WaitRoomGUI extends javax.swing.JFrame {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WaitRoomGUI().setVisible(true);
+                new WaitRoomGUI("").setVisible(true);
             }
         });
     }
@@ -192,5 +317,6 @@ public class WaitRoomGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnSuccessWaitRoom;
     private javax.swing.JLabel lblMessage;
     private javax.swing.JPanel pnMainWaitRoom;
+    private javax.swing.JLabel lblUserName;
     // End of variables declaration                   
 }

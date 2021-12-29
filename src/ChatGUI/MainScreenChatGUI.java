@@ -6,6 +6,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -14,14 +16,28 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.json.JSONObject;
+
+import ChatSocketClient.DataSocketClient;
+import ChatSocketClient.SocketConnectionClient;
+import ChatSocketClient.SocketHandlerClient;
+
 public class MainScreenChatGUI extends javax.swing.JFrame {
     
     private StyledDocument doc;
     private SimpleAttributeSet left;
     private SimpleAttributeSet right;
-    private int index = 1;
     
-    public MainScreenChatGUI() {
+    private SocketConnectionClient socket = new SocketConnectionClient();
+    private DataSocketClient dataSocket = new DataSocketClient();
+    
+    private int index = 1;
+    private String username = "";
+    private String username2 = "";
+    
+    public MainScreenChatGUI(String username, String username2) {
+    	this.username = username;
+    	this.username2 = username2;
         initComponents();
         
         // set Location
@@ -46,14 +62,47 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
         StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
         StyleConstants.setForeground(right, Color.BLUE);
         
+        final MainScreenChatGUI gui = this;
+        socket.addListenConnection("send_message", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+                String username = data.getString("username");
+                String message = data.getString("message");
+                
+                try {
+                	if(username.equals(gui.username)) {
+                    	doc.setParagraphAttributes(doc.getLength(), 100, right, false);
+                    	doc.insertString(doc.getLength(), message + "[" + username + "]\n\n", right);
+                    }
+                    else {
+                    	gui.doc.setParagraphAttributes(doc.getLength(), 100, left, false);
+                    	gui.doc.insertString(doc.getLength(), "[" + username + "]" + message + "\n\n", left );
+                    }
+                }catch (Exception e) {
+					e.printStackTrace();
+				}
+            }
+        });
+        
+        socket.addListenConnection("out_room_response", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+            	WaitRoomGUI waitRoom = new WaitRoomGUI(gui.username);
+                waitRoom.setVisible(true);
+                gui.dispose(); 
+            }
+        });
+        
         // set Onclose
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);// when [X] is pressed
-        final MainScreenChatGUI gui = this;
+        
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                WaitRoomGUI waitRoom = new WaitRoomGUI();
-                waitRoom.setVisible(true);
-                gui.dispose();
+//                WaitRoomGUI waitRoom = new WaitRoomGUI("");
+//                waitRoom.setVisible(true);
+//                gui.dispose();
+            	String dataSend = dataSocket.exportDataOutRoom(gui.username);
+            	socket.sendData(dataSend);
             }
         });
     }
@@ -98,7 +147,7 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
         lblImageUserCustom.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         lblUsernameCustom.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblUsernameCustom.setText("User Khách");
+        lblUsernameCustom.setText(username2 + " (Đối tượng)");
 
         javax.swing.GroupLayout pnUserCustomLayout = new javax.swing.GroupLayout(pnUserCustom);
         pnUserCustom.setLayout(pnUserCustomLayout);
@@ -120,7 +169,7 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
         lblImageUserMe.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         lblUsernameMe.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblUsernameMe.setText("User chủ");
+        lblUsernameMe.setText(this.username + " (Bạn)");
 
         javax.swing.GroupLayout pnUserMeLayout = new javax.swing.GroupLayout(pnUserMe);
         pnUserMe.setLayout(pnUserMeLayout);
@@ -187,21 +236,26 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        try {
-            if(index % 2 == 0) {
-                doc.setParagraphAttributes(doc.getLength(), 100, left, false);
-                doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", left );
-            }
-            else {
-                doc.setParagraphAttributes(doc.getLength(), 100, right, false);
-                doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", right );
-            }
-            ++index;
-            
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if(index % 2 == 0) {
+//                doc.setParagraphAttributes(doc.getLength(), 100, left, false);
+//                doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", left );
+//            }
+//            else {
+//                doc.setParagraphAttributes(doc.getLength(), 100, right, false);
+//                doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", right );
+//            }
+//            ++index;
+//            
+//        }
+//        catch(Exception e) {
+//            e.printStackTrace();
+//        }
+    	String message = txtInput.getText().trim();
+    	if(!message.equals("")) {
+    		String dataSend = dataSocket.exportDataSendMessage(this.username, message);
+            socket.sendData(dataSend);
+    	}
     }                                       
 
     public static void main(String args[]) {
@@ -224,7 +278,7 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainScreenChatGUI().setVisible(true);
+                new MainScreenChatGUI("", "").setVisible(true);
             }
         });
     }
