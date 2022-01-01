@@ -1,10 +1,10 @@
-package Server;
+package ApplicationServer;
 
 import ChatSocketServer.SocketConnectionServer;
 
-public class Server {
+public class Main {
 	public static void main(String[] args) {
-		SocketConnectionServer socket = new SocketConnectionServer();
+    	SocketConnectionServer socket = new SocketConnectionServer();
         socket.startConnection();
-	}
+    }
 }

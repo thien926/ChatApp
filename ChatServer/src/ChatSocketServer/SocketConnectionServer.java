@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import ChatSocketClient.DataSocketClient;
 import ChatSocketServer.Handler.AcceptPairingHandler;
 import ChatSocketServer.Handler.WaitingPairingHandler;
 import ChatSocketServer.Handler.OutRoomHandler;
