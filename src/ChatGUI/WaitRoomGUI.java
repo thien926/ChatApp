@@ -60,9 +60,7 @@ public class WaitRoomGUI extends javax.swing.JFrame {
             @Override
             public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
                 boolean is_started = data.getBoolean("is_started");
-                
                 if (is_started){
-                	
                 	System.out.println(gui.username);
                 	MainScreenChatGUI mainScreen = new MainScreenChatGUI(gui.username, gui.username2);
 	                mainScreen.setVisible(true);
@@ -88,25 +86,13 @@ public class WaitRoomGUI extends javax.swing.JFrame {
             }
         });
         
-//        socket.addListenConnection("start_message", new SocketHandlerClient() {
-//            @Override
-//            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
-//                boolean is_started = data.getBoolean("is_started");
-//                
-//                if (is_started){
-//                    get_pairing_status_false.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sgu/chat/images/get-pairing/get-pairing-status-true.png"))); // NOI18N
-//        
-//                    MainScreen mainScreen = new MainScreen(nickname);
-//                    mainScreen.setVisible(true);
-//                    dispose(); 
-//                }
-//                else{
-//                    WaitingPairing waitingPairing = new WaitingPairing();
-//                    waitingPairing.setVisible(true);
-//                    dispose(); 
-//                }
-//            }
-//        });
+        socket.addListenConnection("out_waiting_response", new SocketHandlerClient() {
+            @Override
+            public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
+            	btnSuccessWaitRoom.setEnabled(true);
+		        lblMessage.setText("Bắt đầu ghép đôi");
+            }
+        });
         
         // set onClose
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);// when [X] is pressed
@@ -254,13 +240,11 @@ public class WaitRoomGUI extends javax.swing.JFrame {
 
     private void btnErrorWaitRoomActionPerformed(java.awt.event.ActionEvent evt) {                                                 
     	switch (btnErrorWaitRoom.getText()) {
-//			case "Bắt đầu ghép đôi": {
-//				String username = this.username;
-//		        String data = dataSocket.exportDataGoMatch(username);
-//		        socket.sendData(data);
-//		        this.lblMessage.setText("Đang chờ ghép đôi...!");
-//				break;
-//			}
+			case "Hủy": {
+				String dataSend = dataSocket.exportDataOutWaiting(this.username);
+		        socket.sendData(dataSend);
+				break;
+			}
 			case "Từ chối": {
 				String dataSend = dataSocket.exportDataAcceptPairing(this.username, false);     
 		        socket.sendData(dataSend);

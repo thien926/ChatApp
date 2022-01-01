@@ -14,9 +14,9 @@ import org.json.JSONObject;
 
 import ChatSocketClient.DataSocketClient;
 import ChatSocketServer.Handler.AcceptPairingHandler;
-import ChatSocketServer.Handler.ExitGameHandler;
 import ChatSocketServer.Handler.WaitingPairingHandler;
 import ChatSocketServer.Handler.OutRoomHandler;
+import ChatSocketServer.Handler.OutWaitingHandler;
 import ChatSocketServer.Handler.SendMessageHandler;
 import ChatSocketServer.Handler.SendNicknameHandler;
 
@@ -35,31 +35,14 @@ public class SocketConnectionServer {
             server = new ServerSocket(socketPort);
             System.out.println("===== Server has started =====");
 
-            Thread thread_go_match = new Thread(new Runnable() {
+            Thread thread_go_chat = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     new WaitingPairingHandler().getPair();
                 }
             });
-            thread_go_match.start();
-
-//            Thread thread_get_group = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    new GetInfoHandler().getGroup();
-//                }
-//            });
-//            thread_get_group.start();
-
-//            Thread thread_get_user = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    new GetInfoHandler().getUser();
-//                }
-//            });
-//            thread_get_user.start();
+            thread_go_chat.start();
             
-
             while (true) {
                 Socket socket = server.accept();
                 System.out.println("connect - " + socket.toString());
@@ -96,18 +79,21 @@ public class SocketConnectionServer {
                 String type = dataReceive.getString("type");
 
                 switch (type) {
-	                case "send_nickname":
+	                case "send_username":
 	                    new SendNicknameHandler().run(data, socket, in, out);
 	                    break;
-                    case "send_message":
-                        new SendMessageHandler().run(data, in, out);
-                        break;
                     case "waiting_pairing":
                         new WaitingPairingHandler().run(data, in, out);
+                        break;
+                    case "out_waiting":
+                        new OutWaitingHandler().run(data, socket, in, out);
                         break;
                     case "accept_pariring":
                         new AcceptPairingHandler().run(data, in, out);
                         break;  
+                    case "send_message":
+                        new SendMessageHandler().run(data, in, out);
+                        break;
                     case "out_room":
                         new OutRoomHandler().run(data, socket, in, out);
                         break;

@@ -15,7 +15,7 @@ public class DataSocketClient {
     /**
      *  # data format
 	{
-            "type": "send_nickname",
+            "type": "send_username",
             "data": {
                 "username": "asdasd",
             }
@@ -23,11 +23,11 @@ public class DataSocketClient {
      * @param nickname
      * @return 
      */
-    public String exportDataSendNickname(String nickname) {
+    public String exportDataSendUsername(String nickname) {
         JSONObject jo = new JSONObject();
         JSONObject data = new JSONObject();
 
-        jo.put("type", "send_nickname");
+        jo.put("type", "send_username");
         data.put("username", nickname);
         jo.put("data", data);
         return encryptData(jo.toString());
@@ -148,8 +148,8 @@ public class DataSocketClient {
 	{
             "type": "accept_pariring",
             "data": {
-                "username": 1101, #id ngÆ°á»�i dÃ¹ng
-                "is_accepted": true # Ä‘á»“ng Ã½ ghÃ©p cáº·p hay khÃ´ng
+                "username": 1101, 
+                "is_accepted": true 
             }
 	}
      * @param userID
@@ -184,6 +184,27 @@ public class DataSocketClient {
         JSONObject data = new JSONObject();
 
         jo.put("type", "out_match");
+        data.put("username", username);
+        jo.put("data", data);
+        return encryptData(jo.toString());
+    }
+    
+    /**
+     *  # data format
+	{
+            "type": "out_waiting",
+            "data": {
+                "username": "asdasd"
+            }
+	}
+     * @param nickname
+     * @return 
+     */
+    public String exportDataOutWaiting(String username) {
+        JSONObject jo = new JSONObject();
+        JSONObject data = new JSONObject();
+
+        jo.put("type", "out_waiting");
         data.put("username", username);
         jo.put("data", data);
         return encryptData(jo.toString());

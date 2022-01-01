@@ -16,7 +16,7 @@ public class DataSocketServer {
     /**
      * 	# data format
 	{
-            "type": "send_nickname_response",
+            "type": "send_username_response",
             "data": {
                 "is_success": true,
                 "message": "asdasd"
@@ -25,11 +25,11 @@ public class DataSocketServer {
      * @param groups
      * @return 
      */
-    public String exportDataSendNickname(boolean is_success, String message){
+    public String exportDataSendUsername(boolean is_success, String message){
         JSONObject jo = new JSONObject();      
         JSONObject data = new JSONObject();      
         
-        jo.put("type", "send_nickname_response");
+        jo.put("type", "send_username_response");
         
         data.put("is_success", is_success);        
         data.put("message", message);
@@ -146,6 +146,22 @@ public class DataSocketServer {
         return encryptData(jo.toString());
     }
     
+    /**
+     * 	# data format
+	{
+            "type": "out_waiting_response",
+            "data": {}
+	}
+     * @return 
+     */
+    public String exportDataOutWaiting(){
+        JSONObject jo = new JSONObject();          
+        JSONObject data = new JSONObject();   
+        
+        jo.put("type", "out_waiting_response");
+        jo.put("data", data);
+        return encryptData(jo.toString());
+    }
     
     public JSONObject importData(String rawData){
         return new JSONObject(rawData);

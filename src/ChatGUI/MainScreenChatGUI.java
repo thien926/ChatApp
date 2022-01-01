@@ -31,7 +31,6 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
     private SocketConnectionClient socket = new SocketConnectionClient();
     private DataSocketClient dataSocket = new DataSocketClient();
     
-    private int index = 1;
     private String username = "";
     private String username2 = "";
     
@@ -72,11 +71,11 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
                 try {
                 	if(username.equals(gui.username)) {
                     	doc.setParagraphAttributes(doc.getLength(), 100, right, false);
-                    	doc.insertString(doc.getLength(), message + "[" + username + "]\n\n", right);
+                    	doc.insertString(doc.getLength(), message + "\n\n", right);
                     }
                     else {
                     	gui.doc.setParagraphAttributes(doc.getLength(), 100, left, false);
-                    	gui.doc.insertString(doc.getLength(), "[" + username + "]" + message + "\n\n", left );
+                    	gui.doc.insertString(doc.getLength(), "[" + username + "] " + message + "\n\n", left );
                     }
                 }catch (Exception e) {
 					e.printStackTrace();
@@ -98,9 +97,6 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
         
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-//                WaitRoomGUI waitRoom = new WaitRoomGUI("");
-//                waitRoom.setVisible(true);
-//                gui.dispose();
             	String dataSend = dataSocket.exportDataOutRoom(gui.username);
             	socket.sendData(dataSend);
             }
@@ -235,26 +231,12 @@ public class MainScreenChatGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>                        
 
-    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {                                        
-//        try {
-//            if(index % 2 == 0) {
-//                doc.setParagraphAttributes(doc.getLength(), 100, left, false);
-//                doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", left );
-//            }
-//            else {
-//                doc.setParagraphAttributes(doc.getLength(), 100, right, false);
-//                doc.insertString(doc.getLength(), txtInput.getText() + "\n\n", right );
-//            }
-//            ++index;
-//            
-//        }
-//        catch(Exception e) {
-//            e.printStackTrace();
-//        }
+    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {    
     	String message = txtInput.getText().trim();
     	if(!message.equals("")) {
     		String dataSend = dataSocket.exportDataSendMessage(this.username, message);
             socket.sendData(dataSend);
+            txtInput.setText("");
     	}
     }                                       
 

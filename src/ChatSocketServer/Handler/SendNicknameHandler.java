@@ -22,11 +22,11 @@ public class SendNicknameHandler {
             
             String dataSend = "";
             if (socketClients.keySet().contains(username)) {
-                dataSend = dataSocket.exportDataSendNickname(false, "Nickname đã tồn tại!");
+                dataSend = dataSocket.exportDataSendUsername(false, "Nickname đã tồn tại!");
             }
             else {
                 socketClients.put(username, socket);
-                dataSend = dataSocket.exportDataSendNickname(true, "");
+                dataSend = dataSocket.exportDataSendUsername(true, "");
             }
             
             out.write(dataSend);

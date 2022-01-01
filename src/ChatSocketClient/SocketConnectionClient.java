@@ -54,9 +54,12 @@ public class SocketConnectionClient {
                 String type = dataReceive.getString("type");
 
                 switch (type) {
-	                case "send_nickname_response":
-	                    actions.get("send_nickname_response").onHandle(data, in, out);
+	                case "send_username_response":
+	                    actions.get("send_username_response").onHandle(data, in, out);
 	                    break;
+	                case "out_waiting_response":
+                        actions.get("out_waiting_response").onHandle(data, in, out);
+                        break;
 	                case "send_invitation":
 //                      System.out.println("send_invitation");
                       actions.get("send_invitation").onHandle(data, in, out);

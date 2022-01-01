@@ -21,7 +21,7 @@ public class AcceptPairingHandler {
 
     public void run(JSONObject data, BufferedReader in, BufferedWriter out) {
 
-        String username = data.getString("username");
+    	String username = data.getString("username");
         boolean is_accepted = data.getBoolean("is_accepted");
         Group group = getGroup(username);
         
@@ -29,19 +29,31 @@ public class AcceptPairingHandler {
             return ;
         }
         
-//        String dataSend1 = "", dataSend2 = "";
-        String dataSend = datasocket.exportDataStartMessage(true);
+        String dataSend;
+        boolean is_success = false;
+        if (is_accepted) {
+            group.setAccept_pairing_1(username, true);
+            group.setAccept_pairing_2(username, true);
+
+            if (group.isAcceptPairing1() && group.isAcceptPairing2()) {
+                dataSend = datasocket.exportDataStartMessage(true);
+                is_success = true;
+            } else {
+                return;
+            }
+        } else {
+            dataSend = datasocket.exportDataStartMessage(false);
+            removeGroup(username);
+        }
         
-        String username1 = group.getUser1();
-        String username2 = group.getUser2();
-        
-        Map<String, Socket> userList = new SocketConnectionServer().getSocketClients();
-        Socket socketUser1 = userList.get(username1);
-        Socket socketUser2 = userList.get(username2);
+        Map<String, Socket> userList = SocketConnectionServer.socketClients;
+        Socket socketUser1 = userList.get(group.getUser1());
+        Socket socketUser2 = userList.get(group.getUser2());
 
         try {
             BufferedWriter outUser1 = new BufferedWriter(new OutputStreamWriter(socketUser1.getOutputStream()));
             BufferedWriter outUser2 = new BufferedWriter(new OutputStreamWriter(socketUser2.getOutputStream()));
+            
             outUser1.write(dataSend);
             outUser1.newLine();
             outUser1.flush();
@@ -49,9 +61,24 @@ public class AcceptPairingHandler {
             outUser2.write(dataSend);
             outUser2.newLine();
             outUser2.flush();
-            
+
         } catch (IOException ex) {
-            ex.printStackTrace();
+        
+        }
+        
+        if (is_success){
+            WaitingPairingHandler.denyUsers.put(group.getUser1(), new ArrayList<>());
+            WaitingPairingHandler.denyUsers.put(group.getUser2(), new ArrayList<>());
+        }
+        else{
+            ArrayList <String> denyUsers1 = WaitingPairingHandler.denyUsers.get(group.getUser1());
+            ArrayList <String> denyUsers2 = WaitingPairingHandler.denyUsers.get(group.getUser2());
+            
+            denyUsers1.add(group.getUser2());
+            denyUsers2.add(group.getUser1());
+            
+            WaitingPairingHandler.denyUsers.put(group.getUser1(), denyUsers1);
+            WaitingPairingHandler.denyUsers.put(group.getUser2(), denyUsers2);
         }
     }
 

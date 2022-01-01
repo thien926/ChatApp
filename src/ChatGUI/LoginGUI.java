@@ -40,7 +40,7 @@ public class LoginGUI extends javax.swing.JFrame {
         
         final LoginGUI gui = this;
         socket.startConnection();
-        socket.addListenConnection("send_nickname_response", new SocketHandlerClient() {
+        socket.addListenConnection("send_username_response", new SocketHandlerClient() {
             @Override
             public void onHandle(JSONObject data, BufferedReader in, BufferedWriter out) {
                 boolean isSuccess = data.getBoolean("is_success");
@@ -167,7 +167,7 @@ public class LoginGUI extends javax.swing.JFrame {
     		return;
     	}
     	this.btnLogin.setEnabled(false);
-    	String data = dataSocket.exportDataSendNickname(nickname);
+    	String data = dataSocket.exportDataSendUsername(nickname);
         socket.sendData(data);
         
     }                                        
