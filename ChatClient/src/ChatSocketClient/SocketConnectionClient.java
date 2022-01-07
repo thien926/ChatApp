@@ -18,7 +18,6 @@ public class SocketConnectionClient {
     private static String socketHost = "localhost";    
     private static int socketPort = 5001;
     private static Map <String, SocketHandlerClient> actions = new HashMap<String, SocketHandlerClient>();
-//    private static ArrayList<Thread> events = new ArrayList<Thread>();
 
     public SocketConnectionClient() {}
     
@@ -55,29 +54,36 @@ public class SocketConnectionClient {
 
                 switch (type) {
 	                case "send_username_response":
+                        // Server trả về nickname có tồn tại hay không thì mình tự định nghĩa sự kiện này
+                        // tại LoginGUI
 	                    actions.get("send_username_response").onHandle(data, in, out);
 	                    break;
 	                case "out_waiting_response":
+                        // Chạy sự kiện sau khi server trả kết quả cho việc HỦY ghép đôi trước khi có đối tượng ghép đôi
                         actions.get("out_waiting_response").onHandle(data, in, out);
                         break;
 	                case "send_invitation":
-//                      System.out.println("send_invitation");
-                      actions.get("send_invitation").onHandle(data, in, out);
-                      break;
-	                case "accept_pariring": 
-	                	actions.get("accept_pariring").onHandle(data, in, out);
-	                	break;
+//                      // Server trả về lời mời ghép đôi rồi bắt sự kiện tại giao diện
+                        actions.get("send_invitation").onHandle(data, in, out);
+                        break;
+	                // case "accept_pariring": 
+	                // 	actions.get("accept_pariring").onHandle(data, in, out);
+	                // 	break;
 	                case "start_message":
+                        // Sau khi đồng ý thì server cho phép bắt đầu chat, tiến hành định nghĩa sự kiện
+                        // bắt đầu chat tại WaitRoom - Vào trang chat
 	                	actions.get("start_message").onHandle(data, in, out);
 	                	break;
 	                case "exit_app_response":
+                        // Thoát game
                         actions.get("exit_app_response").onHandle(data, in, out);
                         break;	
 	                case "send_message":
-//                      System.out.println("send_message");
-                      actions.get("send_message").onHandle(data, in, out);
-                      break;
+                        // Chat
+                        actions.get("send_message").onHandle(data, in, out);
+                        break;
 	                case "out_room_response":
+                        // Rời phòng
                         actions.get("out_room_response").onHandle(data, in, out);
                         break;
 	                	

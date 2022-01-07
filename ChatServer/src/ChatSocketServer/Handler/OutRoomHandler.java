@@ -24,24 +24,25 @@ public class OutRoomHandler {
             String dataSend;
             
             if (group != null){
-                String user_1 = group.getUser1();
-                String user_2 = group.getUser2();
-                Socket socket_1 = userList.get(user_1);
-                Socket socket_2 = userList.get(user_2);
+                String user1 = group.getUser1();
+                String user2 = group.getUser2();
+                Socket socket1 = userList.get(user1);
+                Socket socket2 = userList.get(user2);
                     
                 dataSend = dataSocket.exportDataOutRoom();
 
-                BufferedWriter out_socket_1 = new BufferedWriter(new OutputStreamWriter(socket_1.getOutputStream()));
-                out_socket_1.write(dataSend);
-                out_socket_1.newLine();
-                out_socket_1.flush();
+                BufferedWriter outSocket1 = new BufferedWriter(new OutputStreamWriter(socket1.getOutputStream()));
+                outSocket1.write(dataSend);
+                outSocket1.newLine();
+                outSocket1.flush();
 
-                BufferedWriter out_socket_2 = new BufferedWriter(new OutputStreamWriter(socket_2.getOutputStream()));
-                out_socket_2.write(dataSend);
-                out_socket_2.newLine();
-                out_socket_2.flush();
+                BufferedWriter outSocket2 = new BufferedWriter(new OutputStreamWriter(socket2.getOutputStream()));
+                outSocket2.write(dataSend);
+                outSocket2.newLine();
+                outSocket2.flush();
 
-                new AcceptPairingHandler().removeGroup(user_1);
+                // Xóa group chat
+                new AcceptPairingHandler().removeGroup(user1);
 
             }
             

@@ -24,6 +24,8 @@ public class SocketConnectionServer {
     private static ServerSocket server = null;
     private static String socketHost = "localhost";
     private static int socketPort = 5001;
+
+    // List socket của Client
     public static Map<String, Socket> socketClients = new HashMap<String, Socket>();
 
     public SocketConnectionServer() {
@@ -34,13 +36,14 @@ public class SocketConnectionServer {
             server = new ServerSocket(socketPort);
             System.out.println("===== Server has started =====");
 
-            Thread thread_go_chat = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    new WaitingPairingHandler().getPair();
-                }
-            });
-            thread_go_chat.start();
+			
+			Thread thread_go_chat = new Thread(new Runnable() {
+				@Override public void run() { 
+					new WaitingPairingHandler().getPair(); 
+				} 
+			});
+			thread_go_chat.start();
+			 
             
             while (true) {
                 Socket socket = server.accept();
@@ -79,24 +82,32 @@ public class SocketConnectionServer {
 
                 switch (type) {
 	                case "send_username":
+                        // Check xem nickname đã tồn tại chưa
 	                    new SendNicknameHandler().run(data, socket, in, out);
 	                    break;
                     case "waiting_pairing":
+                        // Sau khi Client nhấn 'Bắt đầu ghép đôi', server nhân nickname và thêm 
+                    	// nickname vào hàng đơi
                         new WaitingPairingHandler().run(data, in, out);
                         break;
                     case "out_waiting":
+                        // Hành động hủy ghép cặp trước khi có đối tượng ghép cặp
                         new OutWaitingHandler().run(data, socket, in, out);
                         break;
                     case "accept_pariring":
+                        // Nhận được lời đồng ý hay từ chối thì xử lý có tạo phòng chat không?
                         new AcceptPairingHandler().run(data, in, out);
                         break;  
                     case "send_message":
+                        // Hành động gửi tin nhắn từ Client
                         new SendMessageHandler().run(data, in, out);
                         break;
                     case "out_room":
+                        // Hành động thoát phòng
                         new OutRoomHandler().run(data, socket, in, out);
                         break;
                     case "exit_app":
+                        // Thoát ứng dụng
                     	String nickname = data.getString("username");
                         if (!nickname.equals("") && socketClients.containsKey(nickname)){
                             socketClients.remove(nickname);
@@ -110,8 +121,6 @@ public class SocketConnectionServer {
                         out.close();
                         socket.close();
                         break;
-                        
-                        
                         
                     case "stop":
                         in.close();

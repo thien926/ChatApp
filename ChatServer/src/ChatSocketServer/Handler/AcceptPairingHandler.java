@@ -17,6 +17,7 @@ import ChatSocketServer.SocketConnectionServer;
 public class AcceptPairingHandler {
 	private static DataSocketServer datasocket = new DataSocketServer();
 
+    // Danh sách group chat
     static public ArrayList<Group> groups = new ArrayList<>();
 
     public void run(JSONObject data, BufferedReader in, BufferedWriter out) {
@@ -25,8 +26,9 @@ public class AcceptPairingHandler {
         boolean is_accepted = data.getBoolean("is_accepted");
         Group group = getGroup(username);
         
+        // group ghép cặp đã được cập nhật khi sever tiến hành ghép cặp WaitingPairingHandler.getPair
         if (group == null){
-            return ;
+            return;
         }
         
         String dataSend;
@@ -66,6 +68,7 @@ public class AcceptPairingHandler {
         
         }
         
+        // Nếu 1 trong 2 từ chối thì cập nhật lại danh sách từ chối
         if (is_success){
             WaitingPairingHandler.denyUsers.put(group.getUser1(), new ArrayList<>());
             WaitingPairingHandler.denyUsers.put(group.getUser2(), new ArrayList<>());

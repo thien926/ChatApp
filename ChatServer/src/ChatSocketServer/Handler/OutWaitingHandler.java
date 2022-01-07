@@ -12,14 +12,19 @@ import ChatSocketServer.DataSocketServer;
 import ChatSocketServer.SocketConnectionServer;
 
 public class OutWaitingHandler {
+    // Hủy hành động ghép cặp trước khi có đối tượng ghép cặp
 	public void run(JSONObject data, Socket socket, BufferedReader in, BufferedWriter out) {
         try {
             String username = data.getString("username");
 
+            // Xóa user khỏi hàng đợi
             WaitingPairingHandler.userQueue.remove(username);
-            if (SocketConnectionServer.socketClients.containsKey(username)){
-            	SocketConnectionServer.socketClients.remove(username);
-            }
+            
+//            if (SocketConnectionServer.socketClients.containsKey(username)){
+//            	SocketConnectionServer.socketClients.remove(username);
+//            }
+
+            
             WaitingPairingHandler.denyUsers.put(username, new ArrayList<>());
             DataSocketServer dataSocket = new DataSocketServer();
             String dataSend = dataSocket.exportDataOutWaiting();

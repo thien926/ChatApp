@@ -154,11 +154,7 @@ public class LoginGUI extends javax.swing.JFrame {
         btnLogin.setBackground(new java.awt.Color(204, 204, 204));
     }                                    
 
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {                                         
-//        JOptionPane.showMessageDialog(this, "Nickname đã tồn tại", "Error", JOptionPane.ERROR_MESSAGE);
-//        WaitRoomGUI cc = new WaitRoomGUI();
-//        cc.setVisible(true);
-//        this.dispose();
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) { 
     	
     	String nickname = txtUserName.getText().trim();
     	

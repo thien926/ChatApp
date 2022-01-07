@@ -101,10 +101,6 @@ public class WaitRoomGUI extends javax.swing.JFrame {
             public void windowClosing(WindowEvent e) {
                 String dataSend = dataSocket.exportDataExitApp(gui.username);
                 socket.sendData(dataSend);
-                
-//                LoginGUI lg = new LoginGUI();
-//                lg.setVisible(true);
-//                gui.dispose();
             }
         });
     }
@@ -213,10 +209,7 @@ public class WaitRoomGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>                        
 
-    private void btnSuccessWaitRoomActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-//        MainScreenChatGUI mainScreen = new MainScreenChatGUI();
-//        mainScreen.setVisible(true);
-//        this.dispose();
+    private void btnSuccessWaitRoomActionPerformed(java.awt.event.ActionEvent evt) { 
         
         switch (btnSuccessWaitRoom.getText()) {
 			case "Bắt đầu ghép đôi": {
